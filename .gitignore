@@ -1,0 +1,168 @@
+# Task API
+
+A RESTful task management API built with Node.js, Express, and PostgreSQL. Features JWT authentication, rate limiting, and full CRUD operations.
+
+## Tech Stack
+
+- **Runtime:** Node.js
+- **Framework:** Express
+- **Database:** PostgreSQL
+- **Authentication:** JWT
+- **Password hashing:** bcryptjs
+- **Rate limiting:** express-rate-limit
+
+## Project Structure
+```
+task-api/
+├── src/
+│   ├── config/
+│   │   └── db.js
+│   ├── middleware/
+│   │   ├── auth.js
+│   │   └── rateLimiter.js
+│   ├── routes/
+│   │   ├── auth.routes.js
+│   │   └── tasks.routes.js
+│   ├── controllers/
+│   │   ├── auth.controller.js
+│   │   └── tasks.controller.js
+│   ├── models/
+│   │   └── db.sql
+│   └── app.js
+└── server.js
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js v18+
+- PostgreSQL
+
+### Installation
+
+1. Clone the repository
+```bash
+   git clone https://github.com/Ramiro-9/task-api.git
+   cd task-api
+```
+
+2. Install dependencies
+```bash
+   npm install
+```
+
+3. Set up environment variables
+```bash
+   cp .env.example .env
+```
+   Fill in your values in `.env`.
+
+4. Create the database and run the schema
+```sql
+   CREATE DATABASE taskdb;
+```
+   Then run the contents of `src/models/db.sql` in your database.
+
+5. Start the server
+```bash
+   npm run dev
+```
+
+## Environment Variables
+```
+PORT=3000
+DATABASE_URL=postgresql://user:password@localhost:5432/taskdb
+JWT_SECRET=your_secret_key
+JWT_EXPIRES_IN=7d
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX=100
+```
+
+## API Endpoints
+
+### Auth
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | ❌ | Register a new user |
+| POST | `/api/auth/login` | ❌ | Login and receive JWT |
+
+### Tasks
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/tasks` | ✅ | Get all tasks |
+| POST | `/api/tasks` | ✅ | Create a task |
+| PUT | `/api/tasks/:id` | ✅ | Update a task |
+| DELETE | `/api/tasks/:id` | ✅ | Delete a task |
+
+## Usage
+
+### Register
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "yourpassword"
+}
+```
+
+### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "yourpassword"
+}
+```
+
+### Create a task
+```http
+POST /api/tasks
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "My first task",
+  "description": "Task description"
+}
+```
+
+### Update a task
+```http
+PUT /api/tasks/1
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "completed": true
+}
+```
+
+## Database Schema
+```sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE tasks (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  completed BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+## License
+
+MIT
